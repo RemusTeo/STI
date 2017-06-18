@@ -13,5 +13,3 @@ table=1,priority=0,actions=resubmit(,2)
 priority=0,table=2,arp,nw_dst=10.0.0.1,actions=output:1
 priority=0,table=2,arp,nw_dst=10.0.0.2,actions=output:2
 
-table=0,priority=0,actions=resubmit(,1)
-table=1,priority=1,actions=resubmit(,2)
