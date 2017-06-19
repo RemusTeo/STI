@@ -3,7 +3,7 @@ from flask import Flask, jsonify
 
 #Show Bridge
 def get_ovsvsctl():
-    output = subprocess.check_output(['sudo','ovs-vsctl','show'])
+    output = subprocess.check_output(['sudo','ovs-vsctl','list-br'])
     return output
 
 #Create Bridge
