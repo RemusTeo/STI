@@ -35,75 +35,129 @@ def not_found(error):
 
 #--------------------------Bridge-------------------------------
 
-#Read bridge
-@call.route('/bridge/read/<bridge>', methods=['GET'])
+#GET Bridge
+@call.route('/read/bridge/<bridge_id>', methods=['GET'])
 @auth.login_required
-def getBridge(bridge):
-    #if does not exist, cant get, so abort 404
-    if len(str(errorhandling_remus.get_bridge_EH(bridge))) == 0:
-        abort(404)
+def get_ovsvsctl(bridge_id):
+	bridge = sub_hakim.get_ovsvsctl(bridge_id)
+	return jsonify({'Bridge' :bridge.splitlines()})
 
-    bridge = sub_remus.get_bridge(bridge)
-    return jsonify({'Bridge':bridge.splitlines()})
-
-#Create bridge
-@call.route('/bridge/post', methods=['POST'])
+#POST Bridge
+@call.route('/write/bridge', methods=['POST'])
 @auth.login_required
-def addBridge():
-    #if curl no -d, or -d not bridge, abort 400
-    if not request.json or not 'bridge' in request.json or type(request.json['bridge']) != unicode:
-        abort(400)
+def create_input():
+        bridge = request.json['bridge']
+	sub_hakim.create_input(bridge)
+	return jsonify({'Bridge' : bridge,
+			'Port' : bridge,
+			'Interface' : bridge,
+			'Type' : "internal"
+					}), 201
 
-    bridge = request.json['bridge']
-
-    #if already exist, cant post, so abort 400
-    if len(str(errorhandling_remus.get_bridge_EH(bridge))) != 0:
-        abort(400)
-
-    sub_remus.add_bridge(bridge)
-    
-    #check if added successfully
-    if len(str(errorhandling_remus.get_bridge_EH(bridge))) == 0:
-        abort(400)
-
-    return jsonify({'bridge': bridge}), 201
-
-#Update bridge
-@call.route('/bridge/update/<bridge>', methods=['PUT'])
+#DELETE Bridge on particular br
+@call.route('/delete/bridge/<bridge_id>', methods=['DELETE'])
 @auth.login_required
-def updateBridge(bridge):
-    #if curl no -d, or -d not options, abort 400
-    if not request.json or not 'options' in request.json or type(request.json['options']) != unicode:
-        abort(400)
+def delete_input(bridge_id):
+        if len(bridge_id) > 0: #if the bride exist
+                sub_hakim.delete_input(bridge_id)
+        else:
+                abort(404)
+        return jsonify({'result':True})
 
-    options = request.json['options']
-
-    #if does not exist, cant update, so abort 404
-    if len(str(errorhandling_remus.get_bridge_EH(bridge))) == 0:
-        abort(404)
-
-    sub_remus.update_bridge(bridge, options)
-    
-    return jsonify({'bridge': bridge,
-                    'options': options})
-
-#Delete bridge
-@call.route('/bridge/delete/<bridge>', methods=['DELETE'])
+#UPDATE Bridge on a particular br
+@call.route('/update/bridge/<bridge_id>', methods=['PUT'])
 @auth.login_required
-def deleteBridge(bridge):    
-    #if does not exist, cant delete, so abort 404
-    if len(str(errorhandling_remus.get_bridge_EH(bridge))) == 0:
-        abort(404)
+def update_bridge(bridge_id):
+        stp = request.json['stp_enable']
+	sub_hakim.update_bridge(bridge_id,stp)
+        return jsonify({'stp_enable' : stp.rstrip()
+                                        }), 201
 
-    sub_remus.delete_bridge(bridge)
+#------------------------Failmode------------------------
 
-    if len(str(errorhandling_remus.get_bridge_EH(bridge))) != 0:
-        abort(400)
+#GET Failmode on particular br
+@call.route('/read/failmode/<bridge_id>', methods=['GET'])
+@auth.login_required
+def read_failmode(bridge_id):
+       mode =  sub_hakim.read_failmode(bridge_id)
+       return jsonify({'fail_mode' : mode.rstrip()})
 
-    return jsonify({'result': True})
+#POST Failmode on particular br
+@call.route('/write/failmode/<bridge_id>', methods=['POST'])
+@auth.login_required
+def create_failmode(bridge_id):
+        mode = request.json['fail_mode']
+        sub_hakim.create_failmode(bridge_id,mode)
+        return jsonify({'fail_mode' : mode
+			                      }), 201
+
+#DELETE Failmode on particular br
+@call.route('/delete/failmode/<bridge_id>', methods=['DELETE'])
+@auth.login_required
+def delete_mode(bridge_id):
+        if len(bridge_id) > 0: #if the bride exist
+                sub_hakim.delete_mode(bridge_id)
+        else:
+                abort(404)
+        return jsonify({'result':True})
+
+#UPDATE Failmode on particular br
+@call.route('/update/failmode/<bridge_id>', methods=['PUT'])
+@auth.login_required
+def update_failmode(bridge_id):
+        mode = request.json['fail_mode']
+        sub_hakim.update_failmode(bridge_id,mode)
+        return jsonify({'Bridge' : bridge_id,
+                        'Port' : bridge_id,
+                        'Interface' : bridge_id,
+                        'Type' : "internal",
+                        'fail_mode' : mode
+                                              })
 
 
-#--------------------------Flow---------------------------
+#----------------------Controller----------------------
+
+#Get Controller
+@call.route('/read/controller/<bridge_id>', methods=['GET'])
+@auth.login_required
+def read_controller(bridge_id):
+       control =  sub_hakim.read_controller(bridge_id)
+       return jsonify({'controller' : control.rstrip()})
+
+#POST Controller on particular br
+@call.route('/write/controller/<bridge_id>', methods=['POST'])
+@auth.login_required
+def create_controller(bridge_id):
+        control = request.json['Controller']
+        sub_hakim.create_controller(bridge_id,control)
+        return jsonify({'Controller' : control
+                                        }), 201
+
+#DELETE Controller on particular br
+@call.route('/delete/controller/<bridge_id>', methods=['DELETE'])
+@auth.login_required
+def delete_controller(bridge_id):
+	if len(bridge_id) > 0: #if the bride exist
+		sub_hakim.delete_controller(bridge_id)
+	else:
+		abort(404)
+	return jsonify({'result':True})
+
+#UPDATE Controller on particular br
+@call.route('/update/controller/<bridge_id>', methods=['PUT'])
+@auth.login_required
+def update_controller(bridge_id):
+        control = request.json['Controller']
+        sub_hakim.update_controller(bridge_id,control)
+        return jsonify({'Bridge' : bridge_id,
+                        'Port' : bridge_id,
+                        'Interface' : bridge_id,
+                        'Type' : "internal",
+                        'Controller' : control
+                                              }), 201
+
+
+#-------------------------Flow-------------------------
 
 #Read flow of bridge
 @call.route('/flow/read/<bridge>', methods=['GET'])
@@ -417,90 +471,6 @@ def deleteSpecificFlowGroup(bridge,groupid):
         abort(400)
 
     return jsonify({'result': True})
-
-
-#---------------------------Failmode---------------------------
-
-#GET Failmode on particular br
-@call.route('/read/<bridge_id>', methods=['GET'])
-@auth.login_required
-def read_failmode(bridge_id):
-       mode =  sub_hakim.read_failmode(bridge_id)
-       return jsonify({'fail_mode' : mode.rstrip()})
-
-#POST Failmode on particular br
-@call.route('/write/<bridge_id>', methods=['POST'])
-@auth.login_required
-def create_failmode(bridge_id):
-        mode = request.json['fail_mode']
-        sub_hakim.create_failmode(bridge_id,mode)
-        return jsonify({'fail_mode' : mode
-			                      }), 201
-
-#DELETE Failmode on particular br
-@call.route('/deletemode/<bridge_id>', methods=['DELETE'])
-@auth.login_required
-def delete_mode(bridge_id):
-        if len(bridge_id) > 0: #if the bride exist
-                sub_hakim.delete_mode(bridge_id)
-        else:
-                abort(404)
-        return jsonify({'result':True})
-
-#UPDATE Failmode on particular br
-@call.route('/updatemode/<bridge_id>', methods=['PUT'])
-@auth.login_required
-def update_failmode(bridge_id):
-        mode = request.json['fail_mode']
-        sub_hakim.update_failmode(bridge_id,mode)
-        return jsonify({'Bridge' : bridge_id,
-                        'Port' : bridge_id,
-                        'Interface' : bridge_id,
-                        'Type' : "internal",
-                        'fail_mode' : mode
-                                              })
-
-
-#----------------------Controller-----------------------
-
-#Get Controller
-@call.route('/get/<bridge_id>', methods=['GET'])
-@auth.login_required
-def read_controller(bridge_id):
-       control =  sub_hakim.read_controller(bridge_id)
-       return jsonify({'controller' : control.rstrip()})
-
-#POST Controller on particular br
-@call.route('/create/<bridge_id>', methods=['POST'])
-@auth.login_required
-def create_controller(bridge_id):
-        control = request.json['Controller']
-        sub_hakim.create_controller(bridge_id,control)
-        return jsonify({'Controller' : control
-                                        }), 201
-
-#DELETE Controller on particular br
-@call.route('/deletecontroller/<bridge_id>', methods=['DELETE'])
-@auth.login_required
-def delete_controller(bridge_id):
-	if len(bridge_id) > 0: #if the bride exist
-		sub_hakim.delete_controller(bridge_id)
-	else:
-		abort(404)
-	return jsonify({'result':True})
-
-#UPDATE Controller on particular br
-@call.route('/updatecontroller/<bridge_id>', methods=['PUT'])
-@auth.login_required
-def update_controller(bridge_id):
-        control = request.json['Controller']
-        sub_hakim.update_controller(bridge_id,control)
-        return jsonify({'Bridge' : bridge_id,
-                        'Port' : bridge_id,
-                        'Interface' : bridge_id,
-                        'Type' : "internal",
-                        'Controller' : control
-                                              }), 201
 
 
 #------------------------------Port----------------------------------
