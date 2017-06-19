@@ -3,18 +3,18 @@ import sub_hakim
 from flask import Flask, jsonify, request, make_response
 from flask_httpauth import HTTPBasicAuth
 
-read = Flask(__name__)
+call = Flask(__name__)
 auth = HTTPBasicAuth()
 
 #GET Bridge
-@read.route('/read', methods=['GET'])
+@call.route('/read', methods=['GET'])
 @auth.login_required
 def get_ovsvsctl():
 	bridge = sub_hakim.get_ovsvsctl()
 	return jsonify({'Bridge' :bridge.splitlines()})
 
 #POST Bridge
-@read.route('/write', methods=['POST'])
+@call.route('/write', methods=['POST'])
 @auth.login_required
 def create_input():
         bridge = request.json['bridge']
@@ -26,7 +26,7 @@ def create_input():
 					}), 201
 
 #DELETE Bridge on particular br
-@read.route('/delete/<bridge_id>', methods=['DELETE'])
+@call.route('/delete/<bridge_id>', methods=['DELETE'])
 @auth.login_required
 def delete_input(bridge_id):
         if len(bridge_id) > 0: #if the bride exist
@@ -36,7 +36,7 @@ def delete_input(bridge_id):
         return jsonify({'result':True})
 
 #UPDATE Bridge on a particular br
-@read.route('/updatebridge/<bridge_id>', methods=['PUT'])
+@call.route('/updatebridge/<bridge_id>', methods=['PUT'])
 @auth.login_required
 def update_bridge(bridge_id):
         stp = request.json['stp_enable']
@@ -45,14 +45,14 @@ def update_bridge(bridge_id):
                                         }), 201
 
 #GET Failmode on particular br
-@read.route('/read/<bridge_id>', methods=['GET'])
+@call.route('/read/<bridge_id>', methods=['GET'])
 @auth.login_required
 def read_failmode(bridge_id):
        mode =  sub_hakim.read_failmode(bridge_id)
        return jsonify({'fail_mode' : mode.rstrip()})
 
 #POST Failmode on particular br
-@read.route('/write/<bridge_id>', methods=['POST'])
+@call.route('/write/<bridge_id>', methods=['POST'])
 @auth.login_required
 def create_failmode(bridge_id):
         mode = request.json['fail_mode']
@@ -61,7 +61,7 @@ def create_failmode(bridge_id):
 			                      }), 201
 
 #DELETE Failmode on particular br
-@read.route('/deletemode/<bridge_id>', methods=['DELETE'])
+@call.route('/deletemode/<bridge_id>', methods=['DELETE'])
 @auth.login_required
 def delete_mode(bridge_id):
         if len(bridge_id) > 0: #if the bride exist
@@ -71,7 +71,7 @@ def delete_mode(bridge_id):
         return jsonify({'result':True})
 
 #UPDATE Failmode on particular br
-@read.route('/updatemode/<bridge_id>', methods=['PUT'])
+@call.route('/updatemode/<bridge_id>', methods=['PUT'])
 @auth.login_required
 def update_failmode(bridge_id):
         mode = request.json['fail_mode']
@@ -84,14 +84,14 @@ def update_failmode(bridge_id):
                                               })
 
 #Get Controller
-@read.route('/get/<bridge_id>', methods=['GET'])
+@call.route('/get/<bridge_id>', methods=['GET'])
 @auth.login_required
 def read_controller(bridge_id):
        control =  sub_hakim.read_controller(bridge_id)
        return jsonify({'controller' : control.rstrip()})
 
 #POST Controller on particular br
-@read.route('/create/<bridge_id>', methods=['POST'])
+@call.route('/create/<bridge_id>', methods=['POST'])
 @auth.login_required
 def create_controller(bridge_id):
         control = request.json['Controller']
@@ -100,7 +100,7 @@ def create_controller(bridge_id):
                                         }), 201
 
 #DELETE Controller on particular br
-@read.route('/deletecontroller/<bridge_id>', methods=['DELETE'])
+@call.route('/deletecontroller/<bridge_id>', methods=['DELETE'])
 @auth.login_required
 def delete_controller(bridge_id):
 	if len(bridge_id) > 0: #if the bride exist
@@ -110,7 +110,7 @@ def delete_controller(bridge_id):
 	return jsonify({'result':True})
 
 #UPDATE Controller on particular br
-@read.route('/updatecontroller/<bridge_id>', methods=['PUT'])
+@call.route('/updatecontroller/<bridge_id>', methods=['PUT'])
 @auth.login_required
 def update_controller(bridge_id):
         control = request.json['Controller']
@@ -133,11 +133,11 @@ def get_password(username):
 def unauthorised():
         return make_response(jsonify({'error': 'Unauthorised access'}), 403)
 
-@read.errorhandler(400)
+@call.errorhandler(400)
 def not_found(error):
         return make_response(jsonify({'error' : 'Bad request'}), 400)
 
-@read.errorhandler(404)
+@call.errorhandler(404)
 def not_found(error):
         return make_response(jsonify({'error': 'Not found'}), 404)
 
