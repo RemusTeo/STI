@@ -7,10 +7,10 @@ call = Flask(__name__)
 auth = HTTPBasicAuth()
 
 #GET Bridge
-@call.route('/read/bridge', methods=['GET'])
+@call.route('/read/bridge/<bridge_id>', methods=['GET'])
 @auth.login_required
-def get_ovsvsctl():
-	bridge = sub_hakim.get_ovsvsctl()
+def get_ovsvsctl(bridge_id):
+	bridge = sub_hakim.get_ovsvsctl(bridge_id)
 	return jsonify({'Bridge' :bridge.splitlines()})
 
 #POST Bridge

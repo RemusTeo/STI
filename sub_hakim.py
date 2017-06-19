@@ -2,8 +2,8 @@ import subprocess
 from flask import Flask, jsonify
 
 #Show Bridge
-def get_ovsvsctl():
-    output = subprocess.check_output(['sudo','ovs-vsctl','list-br'])
+def get_ovsvsctl(bridge_id):
+    output = subprocess.check_output(['sudo','ovs-vsctl','list', 'Bridge', bridge_id])
     return output
 
 #Create Bridge
