@@ -885,19 +885,19 @@ def update_qos(interface):
 @call.route('/showqos/<interface>', methods=['GET'])
 @auth.login_required
 def get_qos(interface):
-	return sub_abdullah.show_qos(interface)
+	return jsonify({'Information about the interface':sub_abdullah.show_qos(interface).splitlines()})
 
 #Get QoS ingress_policing_rate for the interface
 @call.route('/showqosrate/<interface>', methods=['GET'])
 @auth.login_required
 def get_qosrate(interface):
-	return sub_abdullah.show_qosrate(interface)
+	return jsonify({'Ingress_policing_rate':sub_abdullah.show_qosrate(interface)})
 
 #Get QoS ingress_policing_burst for the interface
 @call.route('/showqosburst/<interface>', methods=['GET'])
 @auth.login_required
 def get_qosburst(interface):
-        return sub_abdullah.show_qosburst(interface)
+        return jsonify({'Ingress_policing_burst':sub_abdullah.show_qosburst(interface)})
 
 
 #Delete QoS configuration for the particular interface
@@ -929,7 +929,7 @@ def add_ssl():
 @call.route('/getssl', methods=['GET'])
 @auth.login_required
 def get_ssl():
-	return sub_abdullah.get_ssl()
+	return jsonify({'SSL COnfiguration':sub_abdullah.get_ssl().splitlines()})
 
 #Update SSL Configuration
 @call.route('/updatessl', methods=['PUT'])
@@ -995,13 +995,13 @@ def update_stpcost(port):
 @call.route('/getstppriority/<bridge>', methods=['GET'])
 @auth.login_required
 def get_stppri(bridge):
-	return sub_abdullah.get_stppriority(bridge)
+	return jsonify({'STP Priority':sub_abdullah.get_stppriority(bridge)})
 
 #Get STP Configuration for Port Cost
 @call.route('/getstpcost/<port>', methods=['GET'])
 @auth.login_required
 def get_stpcost(port):
-	return sub_abdullah.get_stpcost(port)
+	return jsonify({'STP Cost': sub_abdullah.get_stpcost(port)})
 
 #Delete STP Configuraton for Birdge
 @call.route('/deletestppriority/<bridge>', methods=['DELETE'])
@@ -1024,6 +1024,7 @@ def del_stpcost(port):
 
 #Add OpenFlowVersion
 @call.route('/addopenflowversion/<bridge>', methods=['POST'])
+@auth.login_required
 def add_openflowversion(bridge):
 	protocol = request.json['protocol']
 	sub_abdullah.add_openflowv(bridge,protocol)
@@ -1032,22 +1033,26 @@ def add_openflowversion(bridge):
 
 #Update OpenFlowVersion
 @call.route('/updateopenflowversion/<bridge>', methods=['PUT'])
+@auth.login_required
 def update_openflowversion(bridge):
         protocol = request.json['protocol']
         sub_abdullah.add_openflowv(bridge,protocol)
         return jsonify({'Bridge': bridge,
                         'OpenFlow Version Updated':protocol}),201
 
+#Delete OpenFlow Version
 @call.route('/delopenflowversion/<bridge>', methods=['DELETE'])
+@auth.login_required
 def delete_openflowversion(bridge):
 	sub_abdullah.del_openflowv(bridge)
 	return jsonify ({'Bridge':bridge,
 			'OpenFlow  Version': 'CLEARED'}),201
 
-
+#Get OpenFlow Version
 @call.route('/getopenflowversion/<bridge>', methods=['GET'])
+@auth.login_required
 def get_openflowversion(bridge):
-	return sub_abdullah.get_openflowv(bridge)
+	return jsonify({'OpenFlow Version':sub_abdullah.get_openflowv(bridge)})
 
 if __name__ == '__main__':
     call.run(debug=True)
