@@ -176,7 +176,7 @@ def add_mirror(bridge):
 
         #check if bridge already exists
         if len(str(sub_sean.bridge_pc(bridge))) == 0:
-                abort(400)
+                abort(404)
 	
         if not request.json or not 'port1' in request.json:
                 abort(400)
@@ -233,10 +233,6 @@ def add_mirror(bridge):
                 abort(400)
 
         sub_sean.add_mirror(bridge, port1, port2, port3, port4, name, dest, source, output)
-
-        #check if mirror was added successfully
-        if len(str(sub_sean.check_mirror(name))) == 0:
-                abort(400)
 
         return jsonify({'Bridge': bridge,
 			'Name': name,
