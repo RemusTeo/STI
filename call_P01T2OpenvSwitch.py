@@ -371,20 +371,20 @@ def deleteFlowTableFile(flowtablefile):
 #-------------------------FlowGroup-------------------------
 
 #Read flowgroup from bridge
-@call.route('/flow/flowgroup/read/<bridge>', methods=['GET'])
+@call.route('/flow/flowgroup/read/<openflowversion>/<bridge>', methods=['GET'])
 @auth.login_required
-def getFlowGroup(bridge):
+def getFlowGroup(openflowversion, bridge):
     #if does not exist, cant get, so abort 404
     if len(str(errorhandling_remus.get_bridge_EH(bridge))) == 0:
         abort(404)
 
-    flowgroup = sub_remus.get_flowgroup(bridge)
+    flowgroup = sub_remus.get_flowgroup(openflowversion,bridge)
     return jsonify({'Flowgroup': flowgroup.splitlines()})
 
 #Create flowgroup for bridge
-@call.route('/flow/flowgroup/post/<bridge>', methods=['POST'])
+@call.route('/flow/flowgroup/post/<openflowversion>/<bridge>', methods=['POST'])
 @auth.login_required
-def addFlowGroup(bridge):
+def addFlowGroup(openflowversion, bridge):
     #if curl no -d, or -d not groupid/type/action, abort 400
     if not request.json or not 'groupid' in request.json or type(request.json['groupid']) != unicode or not 'type' in request.json or type(request.json['type']) != unicode or not 'action' in request.json or type(request.json['action']) != unicode:
         abort(400)
@@ -396,15 +396,15 @@ def addFlowGroup(bridge):
     #if does not exist, cant post, so abort 404
     if len(str(errorhandling_remus.get_bridge_EH(bridge))) == 0:
         abort(404)
-    
+
     #if exist, cant post, so abort 400
-    if len(str(errorhandling_remus.get_groupid_EH(bridge,groupid))) != 0:
+    if len(str(errorhandling_remus.get_groupid_EH(openflowversion,bridge,groupid))) != 0:
         abort(400)
 
-    sub_remus.add_flowgroup(bridge, groupid, type1, action)
-    
+    sub_remus.add_flowgroup(openflowversion, bridge, groupid, type1, action)
+
     #check if successfully created
-    if len(str(errorhandling_remus.get_groupid_EH(bridge,groupid))) == 0:
+    if len(str(errorhandling_remus.get_groupid_EH(openflowversion,bridge,groupid))) == 0:
         abort(400)
 
     return jsonify({'bridge': bridge,
@@ -413,9 +413,9 @@ def addFlowGroup(bridge):
                     'action': action}), 201
 
 #Update flowgroup of bridge
-@call.route('/flow/flowgroup/update/<bridge>/<groupid>', methods=['PUT'])
+@call.route('/flow/flowgroup/update/<openflowversion>/<bridge>/<groupid>', methods=['PUT'])
 @auth.login_required
-def updateFlowGroup(bridge,groupid):
+def updateFlowGroup(openflowversion,bridge,groupid):
     #if curl no -d, or -d not type/action, abort 400
     if not request.json or not 'type' in request.json or type(request.json['type']) != unicode or not 'action' in request.json or type(request.json['action']) != unicode:
         abort(400)
@@ -428,50 +428,49 @@ def updateFlowGroup(bridge,groupid):
         abort(404)
 
     #if does not exist, cant update, so abort 404
-    if len(str(errorhandling_remus.get_groupid_EH(bridge,groupid))) == 0:
+    if len(str(errorhandling_remus.get_groupid_EH(openflowversion,bridge,groupid))) == 0:
         abort(404)
 
-    sub_remus.update_flowgroup(bridge, groupid, type1, action)
+    sub_remus.update_flowgroup(openflowversion, bridge, groupid, type1, action)
     return jsonify({'bridge': bridge,
                     'groupid': groupid,
                     'type': type1,
                     'action': action})
 
 #Delete all flow groups from bridge
-@call.route('/flow/flowgroup/delete/<bridge>', methods=['DELETE'])
+@call.route('/flow/flowgroup/delete/<openflowversion>/<bridge>', methods=['DELETE'])
 @auth.login_required
-def deleteAllFlowGroup(bridge):
+def deleteAllFlowGroup(openflowversion,bridge):
     #if does not exist, cant update, so abort 404
     if len(str(errorhandling_remus.get_bridge_EH(bridge))) == 0:
         abort(404)
 
-    sub_remus.delete_allflowgroup(bridge)
+    sub_remus.delete_allflowgroup(openflowversion,bridge)
 
-    if len(str(errorhandling_remus.get_any_groupid_EH(bridge))) != 0:
+    if len(str(errorhandling_remus.get_any_groupid_EH(openflowversion,bridge))) != 0:
         abort(400)
 
     return jsonify({'result': True})
 
 #Delete specific flow group from bridge
-@call.route('/flow/flowgroup/delete/specific/<bridge>/<groupid>', methods=['DELETE'])
+@call.route('/flow/flowgroup/delete/specific/<openflowversion>/<bridge>/<groupid>', methods=['DELETE'])
 @auth.login_required
-def deleteSpecificFlowGroup(bridge,groupid):
+def deleteSpecificFlowGroup(openflowversion,bridge,groupid):
     #if does not exist, cant update, so abort 404
     if len(str(errorhandling_remus.get_bridge_EH(bridge))) == 0:
         abort(404)
 
     #if does not exist, cant update, so abort 404
-    if len(str(errorhandling_remus.get_groupid_EH(bridge,groupid))) == 0:
+    if len(str(errorhandling_remus.get_groupid_EH(openflowversion,bridge,groupid))) == 0:
         abort(404)
 
-    sub_remus.delete_specificflowgroup(bridge,groupid)
+    sub_remus.delete_specificflowgroup(openflowversion,bridge,groupid)
 
     #check if successfully deleted
-    if len(str(errorhandling_remus.get_groupid_EH(bridge,groupid))) != 0:
+    if len(str(errorhandling_remus.get_groupid_EH(openflowversion,bridge,groupid))) != 0:
         abort(400)
 
     return jsonify({'result': True})
-
 
 #------------------------------Port----------------------------------
 

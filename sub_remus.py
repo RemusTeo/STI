@@ -65,25 +65,25 @@ def delete_flowtablefile(flowtablefile):
 
 #---------------------FlowGroup---------------------
 
-def get_flowgroup(bridge):
-    x = subprocess.check_output(["sudo", "ovs-ofctl", "-O", "OpenFlow11", "dump-groups", bridge])
-    return x
+def get_flowgroup(openflowversion, bridge):
+    x = 'sudo ovs-ofctl -O ' + openflowversion + ' dump-groups ' + bridge
+    y = subprocess.check_output(["sh", "-c", x])
+    return y
 
-def add_flowgroup(bridge, groupid, type1, action):
-    x = 'sudo ovs-ofctl -O OpenFlow11 add-group ' + bridge + ' group_id=' + groupid + ',type=' + type1 + ',bucket=' + action
+def add_flowgroup(openflowversion, bridge, groupid, type1, action):
+    x = 'sudo ovs-ofctl -O ' + openflowversion + ' add-group ' + bridge + ' group_id=' + groupid + ',type=' + type1 + ',bucket=' + action
     subprocess.call(["sh", "-c", x])
 
-def update_flowgroup(bridge, groupid, type1, action):
-    x = 'sudo ovs-ofctl -O OpenFlow11 mod-group ' + bridge + ' group_id=' + groupid + ',type=' + type1 + ',bucket=' + action
+def update_flowgroup(openflowversion, bridge, groupid, type1, action):
+    x = 'sudo ovs-ofctl -O ' + openflowversion + ' mod-group ' + bridge + ' group_id=' + groupid + ',type=' + type1 + ',bucket=' + action
     subprocess.call(["sh", "-c", x])
 
-def delete_allflowgroup(bridge):
-    x = 'sudo ovs-ofctl -O OpenFlow11 del-groups ' + bridge
+def delete_allflowgroup(openflowversion, bridge):
+    x = 'sudo ovs-ofctl -O ' + openflowversion + ' del-groups ' + bridge
     subprocess.call(["sh", "-c", x])
 
-def delete_specificflowgroup(bridge, groupid):
-    x = 'sudo ovs-ofctl -O OpenFlow11 del-groups ' + bridge + ' group_id=' + groupid
+def delete_specificflowgroup(openflowversion, bridge, groupid):
+    x = 'sudo ovs-ofctl -O ' + openflowversion + ' del-groups ' + bridge + ' group_id=' + groupid
     subprocess.call(["sh","-c", x])
-
 
 
